@@ -1,0 +1,26 @@
+name: Removal regression verification
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Commit or branch to verify
+        required: true
+        default: fix/removal-position-cache
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.15.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm exec playwright install --with-deps chromium webkit
+      - run: pnpm exec playwright test tests/e2e/removal-position.spec.ts --workers=1 --project=chromium --project=webkit --retries=0 --reporter=line
+        env:
+          CI: 'true'
