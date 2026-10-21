@@ -40,6 +40,7 @@ for (const tag of ['ul', 'tbody'] as const) {
           if (performance.now() - started > 2000) throw new Error('Entry animation did not start')
           await new Promise(requestAnimationFrame)
         }
+        const positioning = { inline: parent.style.position, computed: getComputedStyle(parent).position }
         let expected: string[]
         if (operation === 'remove') {
           removed.remove()
@@ -74,8 +75,9 @@ for (const tag of ['ul', 'tbody'] as const) {
         await new Promise(resolve => setTimeout(resolve, 700))
         const actual = Array.from(host.querySelectorAll('li, tbody > tr'), el => el.id)
         controller.destroy?.()
-        return { expected, actual, removedConnected: removed.isConnected }
+        return { expected, actual, removedConnected: removed.isConnected, positioning }
       }, { moduleUrl, tag, operation })
+      console.log(JSON.stringify({ tag, operation, positioning: result.positioning }))
       expect(errors).toEqual([])
       expect(result.removedConnected).toBe(false)
       expect(result.actual).toEqual(result.expected)
