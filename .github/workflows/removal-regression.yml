@@ -21,6 +21,8 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - run: pnpm exec playwright install --with-deps chromium webkit
-      - run: pnpm exec playwright test tests/e2e/removal-position.spec.ts --workers=1 --project=chromium --project=webkit --retries=0 --reporter=line
+      - run: |
+          export PATH="$PWD/node_modules/.bin:$PATH"
+          pnpm exec playwright test tests/e2e/removal-position.spec.ts --workers=1 --project=chromium --project=webkit --retries=0 --reporter=line
         env:
           CI: 'true'
