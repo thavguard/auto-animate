@@ -6,6 +6,10 @@ on:
         description: Commit or branch to verify
         required: true
         default: fix/removal-position-cache
+      baseline:
+        description: Verify the unpatched core with the same tests
+        type: boolean
+        default: false
 jobs:
   regression:
     runs-on: ubuntu-latest
@@ -14,6 +18,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.ref }}
+      - name: Use the unpatched core
+        if: inputs.baseline
+        run: |
+          git fetch --depth=1 origin 06882a8e69ba9bc8456d8f2ae6010f697fd7a37c
+          git show FETCH_HEAD:src/index.ts > src/index.ts
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
